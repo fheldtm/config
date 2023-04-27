@@ -6,7 +6,7 @@ lualine.setup {
     icons_enabled = true,
     theme = 'solarized_dark',
     section_separators = { left = '', right = '' },
-    component_separators = { left = '', right = ''},
+    component_separators = { left = '', right = '' },
     disabled_filetypes = {},
   },
   sections = {
@@ -16,7 +16,7 @@ lualine.setup {
       {
         'filename',
         file_status = true, -- displays file status
-        path = 0 -- 0 = just filename
+        path = 0            -- 0 = just filename
       }
     },
     lualine_x = {

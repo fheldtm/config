@@ -20,7 +20,14 @@ ts.setup {
     'javascript',
     'tsx',
     'typescript',
-    'vue'
+    'vue',
+    'jsdoc',
+    'python',
+    'rust',
+    'scss',
+    'yaml',
+    'java',
+    'go',
   },
   autotag = {
     enable = true,

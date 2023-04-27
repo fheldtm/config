@@ -4,6 +4,8 @@ local actions = require("telescope.actions")
 local actions_state = require('telescope.actions.state')
 local builtin = require("telescope.builtin")
 local sorters = require("telescope.sorters")
+local pickers = require("telescope.pickers")
+local finders = require("telescope.finders")
 
 local current_bufnr
 
@@ -67,7 +69,8 @@ telescope.setup {
       ["n"] = {
         ["q"] = function(e)
           actions.close(e)
-        end
+        end,
+        ["o"] = actions.select_default
       },
     },
     initial_mode = "normal",
@@ -91,9 +94,6 @@ telescope.setup {
             vim.api.nvim_buf_set_lines(0, 0, -1, false, {})
             vim.cmd('startinsert')
           end,
-          -- ["dd"] = function()
-          --  vim.api.nvim_buf_set_lines(0, 2, -1, false, {})
-          -- end,
           ["dd"] = function()
             local line = vim.api.nvim_get_current_line()
             local new_line = line:match("(>.-)%s.*") or line
@@ -110,7 +110,7 @@ telescope.setup {
           end,
           ["/"] = function()
             vim.cmd('startinsert')
-          end
+          end,
         },
       },
     },
@@ -165,3 +165,88 @@ vim.keymap.set("n", "sf", function()
     -- layout_config = { height = 40 }
   })
 end)
+
+----
+
+local function git_command_picker()
+  local commands = {
+    { display = 'Git Diff',   cmd = 'Git diff' },
+    { display = 'Git Blame',  cmd = 'Git blame' },
+    { display = 'Git Commit', cmd = 'Git commit' }
+  }
+
+  pickers.new({}, {
+    prompt_title = 'Git Commands',
+    finder = finders.new_table {
+      results = commands,
+      entry_maker = function(entry)
+        return {
+          value = entry.cmd,
+          display = entry.display,
+          ordinal = entry.display
+        }
+      end
+    },
+    sorter = sorters.get_generic_fuzzy_sorter(),
+    attach_mappings = function(_, map)
+      map('i', '<CR>', function(prompt_bufnr)
+        local selection = actions_state.get_selected_entry()
+        actions.close(prompt_bufnr)
+        vim.cmd(selection.value)
+      end)
+
+      map('n', '<CR>', function(prompt_bufnr)
+        local selection = actions_state.get_selected_entry()
+        actions.close(prompt_bufnr)
+        vim.cmd(selection.value)
+      end)
+
+      return true
+    end
+  }):find()
+  print('this2')
+end
+
+function custom_command_picker()
+  local commands = {
+    { display = 'Git Status',   cmd = git_command_picker },
+    { display = 'Buffers',      cmd = 'Telescope buffers' },
+    { display = 'File Browser', cmd = 'Telescope file_browser' }
+  }
+
+  pickers.new({}, {
+    prompt_title = 'Custom Commands',
+    finder = finders.new_table {
+      results = commands,
+      entry_maker = function(entry)
+        return {
+          value = entry.cmd,
+          display = entry.display,
+          ordinal = entry.display
+        }
+      end
+    },
+    sorter = sorters.get_generic_fuzzy_sorter(),
+    attach_mappings = function(_, map)
+      map('i', '<CR>', function(prompt_bufnr)
+        local selection = actions_state.get_selected_entry()
+        actions.close(prompt_bufnr)
+        vim.cmd(selection.value)
+      end)
+
+      map('n', '<CR>', function(prompt_bufnr)
+        local selection = actions_state.get_selected_entry()
+        actions.close(prompt_bufnr)
+        if (type(selection.value) == "function") then
+          vim.cmd(selection.value())
+        else
+          vim.cmd(selection.value)
+        end
+      end)
+
+      return true
+    end
+  }):find()
+end
+
+vim.api.nvim_set_keymap('n', '<leader>s', ':lua custom_command_picker()<CR>', { noremap = true, silent = true })
