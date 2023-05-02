@@ -38,3 +38,7 @@ keymap.set('n', '<C-w><left>', '<C-w><')
 keymap.set('n', '<C-w><right>', '<C-w>>')
 keymap.set('n', '<C-w><up>', '<C-w>+')
 keymap.set('n', '<C-w><down>', '<C-w>-')
+
+-- default key unbind
+keymap.set('n', 's', '<Nop>', { silent = true })
+keymap.set('n', 'S', '<Nop>', { silent = true })

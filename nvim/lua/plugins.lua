@@ -53,4 +53,13 @@ packer.startup(function(use)
   } -- git diff tool
 
   use 'rcarriga/nvim-notify'
+
+  -- comment
+  use 'numToStr/Comment.nvim'
+
+  -- motion
+  use {
+    'phaazon/hop.nvim',
+    branch = 'v2', -- optional but strongly recommended
+  }
 end)

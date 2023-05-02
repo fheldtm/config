@@ -1,11 +1,10 @@
 local status, telescope = pcall(require, "telescope")
 if (not status) then return end
+
 local actions = require("telescope.actions")
-local actions_state = require('telescope.actions.state')
+local actions_state = require("telescope.actions.state")
 local builtin = require("telescope.builtin")
 local sorters = require("telescope.sorters")
-local pickers = require("telescope.pickers")
-local finders = require("telescope.finders")
 
 local current_bufnr
 
@@ -27,7 +26,7 @@ local function delete_buffer_prompt(prompt_bufnr)
         vim.cmd(':echo ""')
         notify("열려있는 버퍼는 삭제할 수 없습니다.", "warn", {
           title = "telescope error",
-          timeout = 1000,
+          timeout = 0,
         })
       end, 10)
     else
@@ -166,87 +165,6 @@ vim.keymap.set("n", "sf", function()
   })
 end)
 
-----
-
-local function git_command_picker()
-  local commands = {
-    { display = 'Git Diff',   cmd = 'Git diff' },
-    { display = 'Git Blame',  cmd = 'Git blame' },
-    { display = 'Git Commit', cmd = 'Git commit' }
-  }
-
-  pickers.new({}, {
-    prompt_title = 'Git Commands',
-    finder = finders.new_table {
-      results = commands,
-      entry_maker = function(entry)
-        return {
-          value = entry.cmd,
-          display = entry.display,
-          ordinal = entry.display
-        }
-      end
-    },
-    sorter = sorters.get_generic_fuzzy_sorter(),
-    attach_mappings = function(_, map)
-      map('i', '<CR>', function(prompt_bufnr)
-        local selection = actions_state.get_selected_entry()
-        actions.close(prompt_bufnr)
-        vim.cmd(selection.value)
-      end)
-
-      map('n', '<CR>', function(prompt_bufnr)
-        local selection = actions_state.get_selected_entry()
-        actions.close(prompt_bufnr)
-        vim.cmd(selection.value)
-      end)
-
-      return true
-    end
-  }):find()
-  print('this2')
-end
-
-function custom_command_picker()
-  local commands = {
-    { display = 'Git Status',   cmd = git_command_picker },
-    { display = 'Buffers',      cmd = 'Telescope buffers' },
-    { display = 'File Browser', cmd = 'Telescope file_browser' }
-  }
-
-  pickers.new({}, {
-    prompt_title = 'Custom Commands',
-    finder = finders.new_table {
-      results = commands,
-      entry_maker = function(entry)
-        return {
-          value = entry.cmd,
-          display = entry.display,
-          ordinal = entry.display
-        }
-      end
-    },
-    sorter = sorters.get_generic_fuzzy_sorter(),
-    attach_mappings = function(_, map)
-      map('i', '<CR>', function(prompt_bufnr)
-        local selection = actions_state.get_selected_entry()
-        actions.close(prompt_bufnr)
-        vim.cmd(selection.value)
-      end)
-
-      map('n', '<CR>', function(prompt_bufnr)
-        local selection = actions_state.get_selected_entry()
-        actions.close(prompt_bufnr)
-        if (type(selection.value) == "function") then
-          vim.cmd(selection.value())
-        else
-          vim.cmd(selection.value)
-        end
-      end)
-
-      return true
-    end
-  }):find()
-end
-
-vim.api.nvim_set_keymap('n', '<leader>s', ':lua custom_command_picker()<CR>', { noremap = true, silent = true })
+local current_dir = debug.getinfo(1).source:match("@?(.*/)")
+package.path = current_dir .. "?.lua;" .. package.path
+require('telescope/command_picker')
